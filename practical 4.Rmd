@@ -1,0 +1,160 @@
+---
+title: "<span style='font-weight:700'>Practical 4</span>"
+author: "<span style='color:#d5000d; font-weight:700'>Data manipulation</span>"
+output:   
+  prettydoc::html_pretty:
+    theme: tactile
+    highlight: github
+---
+
+```{r setup, include=FALSE}
+knitr::opts_chunk$set(echo = TRUE)
+```
+
+Reproduce this HTML and answer the questions in R chunks.
+
+In this practical, you need the dplyr package and the data set codling from DAAG package. Make sure that the messages when loading the packages in workspace are not displayed in the HTML.
+
+```{r, message=FALSE}
+library(DAAG)
+library(dplyr)
+data("codling")
+```
+
+Style guide: start a new line after each pipe operator!
+
+# The pipe operator
+
+Make each of the following exercises using the pipe operator.
+
+Display a summary of codling. What is special about the summary of the Cultivar variable?
+```{r}
+codling %>%
+  summary()
+```
+Answer: Cultivar's summary does not have any statistical values like mean, median, min, max, and quartiles, but instead has length, class, and mode as it's not a numerical variable.
+
+Display the classes of the variables in codling.
+```{r}
+codling %>%
+  sapply(class)
+```
+
+Display the mean of pobs.
+```{r}
+codling %>%
+  summarise(mean(pobs))
+```
+
+Display the frequencies of Cultivar.
+```{r}
+codling %>%
+  count(Cultivar)
+```
+
+Display the means of pobs within the levels of Cultivar.
+```{r}
+codling %>%
+  group_by(Cultivar) %>%
+  summarise(mean(pobs))
+```
+
+Display the contingency table of Cultivar and year.
+```{r}
+codling %>%
+  group_by(Cultivar, year) %>%
+  count()
+```
+
+Perform a two-sample t-test with dead as dependent variable and year as independent variable. Use the placeholder ..
+```{r}
+codling %>%
+  t.test(dead ~ year, data = .)
+```
+
+# Pipelines
+
+Make the following exercises using the pipe operator without making any intermediate objects.
+
+Display the means and standard deviations of pobs for dose = 8 and dose = 30.
+```{r}
+codling %>%
+  filter(dose == 8 | dose == 30) %>%
+  group_by(dose) %>%
+  summarise(mean(pobs), sd(pobs))
+```
+
+Display the correlation matrix of the variables dose, tot, dead, cm, and numcm.
+```{r}
+codling %>%
+  select(dose, tot, dead, cm, numcm) %>%
+  cor()
+```
+
+Repeat exercise b, but use only cases with a dose equal to or larger than 16, and display the correlations rounded to three decimals.
+```{r}
+codling %>%
+  select(dose, tot, dead, cm, numcm) %>%
+  filter(dose >= 16) %>%
+  cor() %>%
+  round(3)
+```
+
+Display the means and standard deviations of ct for the levels of Cultivar in the year 1988. Order the output on the ascending means, and round the means and standard errors to one decimal place.
+```{r}
+codling %>%
+  filter(year == 1988) %>%
+  group_by(Cultivar) %>%
+  summarise(mean = mean(ct), sd = sd(ct)) %>%
+  arrange(mean) %>%
+  mutate(mean = round(mean, 1), sd = round(sd, 1))
+```
+
+Display the contingency table of Cultivar and dose for “BRAEBURN” and “FUJI” .
+```{r}
+codling %>%
+  group_by(Cultivar, dose) %>%
+  filter(Cultivar == "BRAEBURN" | Cultivar == "FUJI") %>%
+  count()
+```
+
+Perform a two-samples t-test with dependent variable pobs - cm (without saving this variable) and the grouping variable year.
+```{r}
+codling %>%
+  t.test(pobs - cm ~ year, .)
+```
+
+# Saving the result of a pipe
+
+In the following exercises, save the results by using the assignment operator.
+
+On the help page of the codling data the variable gp is listed as a factor, but in the data it is a numeric variable. Convert it into a factor.
+```{r}
+codling %>%
+  mutate(gp = as.numeric(gp)) ->
+  codling
+```
+
+Make a new data set called codling2 consisting of the cultivars Braeburn and Fuji, and the variables Cultivar, dose, tot, dead, and gp.
+```{r}
+
+```
+
+Display a summary of the codling2 variable Cultivar (do not save result).
+```{r}
+
+```
+
+The factor Cultivar has empty levels. Find a function to get rid of these empty levels, and overwrite the codling2 data such that Cultivar only has non-empty levels. Display the summary of Cultivar to check if the empty levels are removed.
+```{r}
+
+```
+
+Add the new variable survived denoting the number of moths that survived (computed as tot - dead) to codling2, and display the means and standard deviations of this new variable within the levels of Cultivar.
+```{r}
+
+```
+
+---
+
+END OF PRACTICAL

@@ -1,0 +1,212 @@
+---
+title: "Practical 3"
+author: "Jodi Tay Seow Xuan"
+date: "2024-02-28"
+output:
+  prettydoc::html_pretty:
+    theme: cayman
+    highlight: github
+---
+
+```{r setup, include=FALSE}
+knitr::opts_chunk$set(echo = TRUE)
+```
+
+## Summary statistics
+
+Make a data frame df with 100 observations, row names id.1 to id.100, and 4 variables (without making the the separate vectors first):
+
++ a random Poisson variable Y with mean 100
+
++ a random normal variable X with mean 100 and standard deviation 10
+
++ a factor S containing the value “f” repeated 40 times and the value “m” repeated 60 times
+
++ a character vector R containing the letters “a” to “d”, each occuring 25 times
+
+```{r}
+df <- data.frame(Y = rpois(100, 100),
+                 X = rnorm(100, 100, 10),
+                 S = factor(rep(c("f", "m"), c(40, 60))),
+                 R = rep(letters[1:4], each = 25),
+                 row.names = paste("id", 1:100, sep = "."))
+```
+
+Display the mean of X.
+
+```{r}
+mean(df$X)
+```
+
+Display the standard deviation of Y.
+
+```{r}
+sd(df$Y)
+```
+
+Display the frequencies of the levels of S.
+
+```{r}
+table(df$S)
+```
+
+Display the correlation of X and Y.
+
+```{r}
+cor(df$X, df$Y)
+```
+
+Display the covariance matrix of X and Y (use only the x argument in the cov() function).
+
+```{r}
+cov(df[, 1:2])
+```
+
+## Logical tests
+
+Display a logical vector with value TRUE if X is greater than 110 and FALSE otherwise.
+
+```{r}
+df$X > 110
+```
+
+Display the vector from the previous exercise as a numeric vector.
+
+```{r}
+as.numeric(df$X > 110)
+```
+
+Display the row numbers of df for which Y has a value smaller than 90.
+
+```{r}
+which(df$Y < 90)
+```
+
+Display the row names of df for which Y has a value smaller than 90.
+
+```{r}
+rownames(df)[which(df$Y < 90)]
+```
+
+Test whether the variable R is a factor.
+
+```{r}
+is.factor(df$R)
+```
+
+Convert the variable R into a factor (overwrite the original version in df), and test if the conversion has been successful.
+
+```{r}
+df$R <- as.factor(df$R)
+is.factor(df$R)
+```
+
+Display the first 5 values of the variable X
+
+```{r}
+head(df$X, 5)
+```
+
+Convert the class of the variable X from numeric to integer (again, overwrite the version in df), and display the first 5 values of X.
+
+```{r}
+df$X <- as.integer(df$X)
+head(df$X, 5)
+```
+
+## Functions with formulas
+
+Display the means of Y within the levels of S.
+
+```{r}
+aggregate(Y ~ S, df, mean)
+```
+
+Display the variances of Y within the levels of R.
+
+```{r}
+aggregate(Y ~ R, df, var)
+```
+
+Display the frequency table for the variables S and R
+
+```{r}
+xtabs(~ S + R, df)
+```
+
+Display the outcome of a t-test with Y as dependent variable and S as grouping factor.
+
+```{r}
+t.test(Y ~ S, df)
+```
+
+Display the summary of an ANOVA with X as dependent variable and R as grouping factor.
+
+```{r}
+summary(aov(X ~ R, df))
+```
+
+Display Tukey’s HSD pairwise comparisons for the above ANOVA.
+
+```{r}
+TukeyHSD(aov(X ~ R, df))
+```
+
+Do the same pairwise comparison with a function starting with the letters pair.
+
+```{r}
+pairwise.t.test(df$X, df$R)
+```
+
+## Using help
+
+For the following exercises you need to find the appropriate function (these functions have not been discussed in the lecture sheets). For each of the exercises, use a single line of code and as few functions/operators as possible!
+
+Display the minimum value of the variable Y.
+
+```{r}
+min(df$Y)
+```
+
+Display the row number of the observation with the largest value X value.
+
+```{r}
+which.max(df$X)
+```
+
+Display a vector with values of Y ordered from small to large.
+
+```{r}
+sort(df$Y)
+```
+
+Display the classes of the variables in df with a single function call.
+
+```{r}
+sapply(df, class)
+```
+
+Test the correlation between X and Y for statistical significance.
+
+```{r}
+cor.test(df$X, df$Y)
+```
+
+Convert the factor R from a nominal variable to an ordinal variable (overwrite the version in df), and display the content of the variable.
+
+```{r}
+df$R <- as.ordered(df$R) 
+df$R
+```
+
+Display the first 6 observations of R.
+
+```{r}
+head(df$R, 6)
+```
+
+When finished, submit your Rmd file to Blackboard before the deadline.
+
+---
+
+END OF PRACTICAL

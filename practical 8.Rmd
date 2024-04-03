@@ -1,0 +1,134 @@
+---
+title: "Practical 8"
+author: "Functional Programming"
+date: "Jodi Tay Seow Xuan"
+output:
+  prettydoc::html_pretty:
+    theme: cayman
+    highlight: github
+    toc: true
+    number_sections: true
+---
+
+```{r setup, include=FALSE}
+knitr::opts_chunk$set(warning = FALSE, message = FALSE) 
+```
+
+# Write your own my_cumsum() function
+
+The base R function cumsum() returns the cumulative sum of its argument, e.g.
+
+```{r}
+cumsum(1:4)
+```
+
+  a. Write the function my_cumsum() that does the same.
+  
+```{r}
+my_cumsum <- function(x) {
+  if (!is.vector(x)) {
+    stop()
+  }
+  
+  n <- length(x)
+  cumsum_values <- numeric(n)
+  cumsum_values[1] <- x[1]
+  
+  for (i in 2:n) {
+    cumsum_values[i] <- cumsum_values[i - 1] + x[i]
+  }
+  
+  return(cumsum_values)
+}
+```
+  
+  b. Show that the function works for the argument -1:4.
+
+```{r}
+my_cumsum(-1:4)
+```
+
+# Bootstrap
+
+a. Source the bootstrap() function of the lecture slides.
+
+```{r}
+library(mosaic)
+```
+
+  b. Fit the linear model mpg ~ disp + drat + qsec of the mtcars data and save the lm object as fit.
+
+```{r}
+data(mtcars)
+fit <- lm(mpg ~ disp + drat + qsec, data = mtcars)
+```
+
+  c. Display the summary of this model.
+
+```{r}
+summary(fit)
+```
+
+  d. Save the bootstrap object for the same model.
+
+```{r}
+library(mosaic)
+boot_fit <- do(1000)*lm(mpg ~ disp + drat + qsec, data = mosaic::resample(mtcars))
+```
+
+  e. Make an object with the bootstrap confidence intervals and one with the theoretical confidence intervals, and compare both.
+
+```{r}
+confint(boot_fit, level = 0.95)
+confint(fit)
+```
+
+```{asis}
+The bootstrap confidence interval and theoretical confidence interval are quite similar for the variables `disp` and `qsec` and the intercept, suggesting that the estimates obtained from the resampling and theoretical sampling are consistent with each other.
+
+However, the bootstrap confidence interval is significantly wider than the theoretical confidence interval for `drat`, suggesting a higher level of uncertainty in the resampling estimate.
+```
+
+  f. In a 2 x 2 plot array, plot the bootstrap sampling distributions of the four parameters in red, and the theoretical sampling distribution of the parameters in blue. For the latter, use stat_function(fun = dnorm, args = list(mean = ..., sd = ...)), using the mean and sd values of the corresponding lm model estimates.
+
+```{r}
+library(ggplot2)
+library(gridExtra)
+mpg_plot <- ggplot(boot_fit) + 
+  geom_histogram(aes(x = Intercept), fill = "red") +
+  stat_function(fun = dnorm,
+                args = list(
+                  mean = 11.524390,
+                  sd = 11.887430),
+                col = "blue")
+
+disp_plot <- ggplot(boot_fit) + 
+  geom_histogram(aes(x = disp), fill = "red") +
+  stat_function(fun = dnorm,
+                args = list(
+                  mean = -0.03136425,
+                  sd = 0.007808782),
+                col = "blue")
+
+drat_plot <- ggplot(boot_fit) + 
+  geom_histogram(aes(x = drat), fill = "red") +
+  stat_function(fun = dnorm,
+                args = list(
+                  mean = -0.03136425,
+                  sd = 0.007808782),
+                col = "blue")
+
+qsec_plot <- ggplot(boot_fit) + 
+  geom_histogram(aes(x = qsec), fill = "red") +
+  stat_function(fun = dnorm,
+                args = list(
+                  mean = -0.03136425,
+                  sd = 0.007808782),
+                col = "blue")
+
+grid.arrange(mpg_plot, disp_plot, drat_plot, qsec_plot, ncol = 2)
+```
+
+---
+
+End of practical
