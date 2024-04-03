@@ -137,7 +137,10 @@ codling %>%
 
 Make a new data set called codling2 consisting of the cultivars Braeburn and Fuji, and the variables Cultivar, dose, tot, dead, and gp.
 ```{r}
-
+codling %>%
+  filter(Cultivar == "BRAEBURN" | Cultivar == "FUJI") %>%
+  select(Cultivar, dose, tot, dead, gp) ->
+  codling2
 ```
 
 Display a summary of the codling2 variable Cultivar (do not save result).
