@@ -72,11 +72,11 @@ area <- ggplot(my_diamonds, aes(carat)) +
   ggtitle("Area")
   
 density <- ggplot(my_diamonds, aes(carat)) +
-  geom_density(kernel = "gaussian") +
+  geom_density() +
   ggtitle("Density")
   
 dot <- ggplot(my_diamonds, aes(carat)) +
-  geom_dotplot() +
+  geom_dotplot(binwidth = 0.04) +
   ggtitle("Dot Plot")
   
 frequency <- ggplot(my_diamonds, aes(carat)) +
@@ -84,7 +84,7 @@ frequency <- ggplot(my_diamonds, aes(carat)) +
   ggtitle("Frequency")
 
 histogram <- ggplot(my_diamonds, aes(carat)) +
-  geom_histogram(binwidth = 0.05) +
+  geom_histogram() +
   ggtitle("Histogram")
   
 qq <- ggplot(my_diamonds) +
@@ -115,17 +115,17 @@ Discrete variables are variables with countable values (i.e. categorical variabl
   a. Display the barplots of the three factors in my_diamonds, in a 1 x 3 plot array. Make sure that the labels of the categories are readable (i.e., not overlapping).
   
 ```{r}
-cut <- ggplot(my_diamonds, aes(cut)) +
+cut <- ggplot(my_diamonds, aes(y = cut)) +
   geom_bar() +
-  scale_x_discrete(guide = guide_axis(check.overlap = TRUE))
+  scale_y_discrete(guide = guide_axis(check.overlap = TRUE))
 
-color <- ggplot(my_diamonds, aes(color)) +
+color <- ggplot(my_diamonds, aes(y = color)) +
   geom_bar() + 
-  scale_x_discrete(guide = guide_axis(check.overlap = TRUE))
+  scale_y_discrete(guide = guide_axis(check.overlap = TRUE))
 
-clarity <- ggplot(my_diamonds, aes(clarity)) +
+clarity <- ggplot(my_diamonds, aes(y = clarity)) +
   geom_bar() +
-  scale_x_discrete(guide = guide_axis(check.overlap = TRUE))
+  scale_y_discrete(guide = guide_axis(check.overlap = TRUE))
 
 grid.arrange(cut, color, clarity, ncol = 3)
 ```
@@ -135,22 +135,22 @@ grid.arrange(cut, color, clarity, ncol = 3)
 ```{r}
 my_diamonds %>%
   count(cut) %>%
-  ggplot(aes(x = cut, y = n)) +
-  scale_x_discrete(guide = guide_axis(check.overlap = TRUE)) +
+  ggplot(aes(n, cut)) +
+  scale_y_discrete(guide = guide_axis(check.overlap = TRUE)) +
   geom_col() ->
   cut_2
 
 my_diamonds %>%
   count(color) %>%
-  ggplot(aes(x = color, y = n)) +
-  scale_x_discrete(guide = guide_axis(check.overlap = TRUE)) +
+  ggplot(aes(n, color)) +
+  scale_y_discrete(guide = guide_axis(check.overlap = TRUE)) +
   geom_col() ->
   color_2
 
 my_diamonds %>%
   count(clarity) %>%
-  ggplot(aes(x = clarity, y = n)) +
-  scale_x_discrete(guide = guide_axis(check.overlap = TRUE)) +
+  ggplot(aes(n, clarity)) +
+  scale_y_discrete(guide = guide_axis(check.overlap = TRUE)) +
   geom_col() ->
   clarity_2
 
@@ -164,19 +164,20 @@ We will start by displaying the joint distribution of a discrete variable and a 
   a. Display a boxplot, a violinplot, and a dotplot of price and cut in a 2 x 2 plot array. Use the argument layout_matrix (instead of nrow) in the grid.arrange() function to plot the boxplot and violinplot side-by-side, in the first row and to plot the dotplot over the full length of the second row. See Arranging multiple grobs on a page: Complex layouts for examples of using layout_matrix.
   
 ```{r}
-boxplot <- ggplot(my_diamonds, aes(x = cut, y = price)) +
+boxplot <- ggplot(my_diamonds, aes(price, cut)) +
   geom_boxplot() +
-  scale_x_discrete(guide = guide_axis(check.overlap = TRUE))
+  scale_y_discrete(guide = guide_axis(check.overlap = TRUE))
 
-violinplot <- ggplot(my_diamonds, aes(x = cut, y = price)) +
+violinplot <- ggplot(my_diamonds, aes(price, cut)) +
   geom_violin() +
-  scale_x_discrete(guide = guide_axis(check.overlap = TRUE))
+  scale_y_discrete(guide = guide_axis(check.overlap = TRUE))
 
-dotplot <- ggplot(my_diamonds, aes(y = price, x = cut)) +
-  geom_dotplot(binaxis = "y", stackdir = "center") +
-  coord_flip()
+dotplot <- ggplot(my_diamonds, aes(cut, price)) +
+  geom_dotplot(binaxis = "y", stackdir = "center", binwidth = 400)
 
-grid.arrange(boxplot, violinplot, dotplot, layout_matrix = rbind(c(1, 2), c(3, 3)), ncol = 2)
+grid.arrange(boxplot, violinplot, dotplot, 
+             layout_matrix = rbind(c(1, 2), c(3, 3)), 
+             ncol = 2)
 
 ```
 
@@ -185,15 +186,15 @@ The joint distribution of two discrete variables is best depicted with barplots 
   b. Display a stacked, a dodged, and a filled barplot of color with colors defined by the levels of clarity in a 1 x 3 plot array.
 
 ```{r}
-stacked <- ggplot(my_diamonds, aes(x = color, fill = clarity)) +
-  geom_bar(position = "stack") +
+stacked <- ggplot(my_diamonds, aes(color, fill = clarity)) +
+  geom_bar() +
   scale_x_discrete(guide = guide_axis(check.overlap = TRUE))
 
-dodged <- ggplot(my_diamonds, aes(x = color, fill = clarity)) +
+dodged <- ggplot(my_diamonds, aes(color, fill = clarity)) +
   geom_bar(position = "dodge") +
   scale_x_discrete(guide = guide_axis(check.overlap = TRUE))
 
-filled <- ggplot(my_diamonds, aes(x = color, fill = clarity)) +
+filled <- ggplot(my_diamonds, aes(color, fill = clarity)) +
   geom_bar(position = "fill") +
   scale_x_discrete(guide = guide_axis(check.overlap = TRUE))
 
@@ -203,22 +204,8 @@ grid.arrange(stacked, dodged, filled, ncol = 3)
   c. Plot the same variables with geom_count().
 
 ```{r}
-counts <- my_diamonds %>%
-  count(color, clarity)
-
-stacked_count <- ggplot(counts, aes(x = color, y = n, fill = clarity)) +
-  geom_count(position = "stack") +
-  scale_x_discrete(guide = guide_axis(check.overlap = TRUE))
-
-dodged_count <- ggplot(counts, aes(x = color, y = n, fill = clarity)) +
-  geom_count(position = "dodge") +
-  scale_x_discrete(guide = guide_axis(check.overlap = TRUE))
-
-filled_count <- ggplot(counts, aes(x = color, y = n, fill = clarity)) +
-  geom_count(position = "fill") +
-  scale_x_discrete(guide = guide_axis(check.overlap = TRUE))
-
-grid.arrange(stacked_count, dodged_count, filled_count, ncol = 3)
+ggplot(my_diamonds, aes(color, clarity)) + 
+    geom_count()
 ```
 
 The joint distribution of two continuous variables is best depicted with a scatterplot. The scale on which the x- and y-axes are displayed can be changed with scale_x_...() and scale_y_...() (search the help files to find information on the different flavors of these functions).
@@ -226,13 +213,14 @@ The joint distribution of two continuous variables is best depicted with a scatt
   d. Display a scatterplot of price and carat in a 1 x 2 plot array. Create one plot with the axes on the original scale and one with the axes on a logarithmic scale (i.e., log base 10). In both plots, add a smoothed regression line (i.e., a loess line), and suppress the grey ribbon for the standard error. Since there is some overplotting, set alpha to 0.1.
 
 ```{r}
-scatter_og <- ggplot(my_diamonds, aes(x = carat, y = price)) +
+scatter_og <- ggplot(my_diamonds, aes(price, carat)) +
   geom_point(alpha = 0.1) +
-  geom_smooth(method = "lm", se = FALSE)
+  geom_smooth(se = FALSE)
 
-scatter_log <- ggplot(my_diamonds, aes(x = carat, y = price)) +
+scatter_log <- ggplot(my_diamonds, aes(price, carat)) +
   geom_point(alpha = 0.1) +
-  geom_smooth(method = "lm", se = FALSE) +
+  geom_smooth(se = FALSE) +
+  scale_x_log10() +
   scale_y_log10()
 
 grid.arrange(scatter_og, scatter_log, ncol = 2)
@@ -245,38 +233,41 @@ More variables can be added to a scatterplot with aesthetics like size, shape, a
   a. Subset my_diamonds as described above, reproduce the 2nd scatterplot from exercise 5d (with carat and price but without the regression line), and display this scatterplot in a 3 x 1 plot array. In each plot, map a different one of the variables z, cut, and color to an appropriate aesthetic (i.e., size, shape, or color). Use alpha in case of overplotting.
 
 ```{r}
-ss_my_diamonds <- my_diamonds %>% 
-  filter(cut %in% c("Fair", "Ideal"))
+my_diamonds %>% 
+  filter(cut %in% c("Fair", "Ideal")) ->
+  ss_my_diamonds
 
-scatter_log <- ggplot(ss_my_diamonds, aes(x = carat, y = price)) +
-  geom_point(aes(color = cut, size = z), alpha = 0.5) +
-  scale_y_log10() +
-  labs(color = "Cut", size = "Z")
+scatter_log <- ggplot(ss_my_diamonds, aes(price, carat)) +
+  geom_point(aes(size = z), alpha = 0.1) +
+  scale_x_log10() +
+  scale_y_log10()
 
 z_color <- ggplot(ss_my_diamonds, aes(x = carat, y = price, color = z)) +
   geom_point(alpha = 0.5) +
-  scale_y_log10() +
-  labs(color = "Z")
+  scale_x_log10() +
+  scale_y_log10()
 
 cut_shape <- ggplot(ss_my_diamonds, aes(x = carat, y = price, shape = cut)) +
   geom_point(alpha = 0.5, size = 3) +
-  scale_y_log10() +
-  labs(shape = "Cut")
+  scale_x_log10() +
+  scale_y_log10()
 
-grid.arrange(scatter_log, z_color, cut_shape, nrow = 3)
+grid.arrange(scatter_log, z_color, cut_shape, ncol = 1)
 ```
 
   b. Reproduce the scatterplot from the previous exercise twice, in a 1 x 2 plot array, but do not map any aesthetics to the z, cut, or color variables. Add smoothed regression lines for cut and color, respectively, to the two plots (i.e., add one line to each plot).
 
 ```{r}
-scatter_log_cut <- ggplot(ss_my_diamonds, aes(x = carat, y = price)) +
-  geom_point(alpha = 0.5) +
-  geom_smooth(aes(color = cut), method = "lm", se = FALSE) +
+scatter_log_cut <- ggplot(ss_my_diamonds, aes(price, carat, col = cut)) +
+  geom_point() +
+  geom_smooth(se = FALSE) +
+  scale_x_log10() +
   scale_y_log10()
 
-scatter_log_color <- ggplot(ss_my_diamonds, aes(x = carat, y = price)) +
-  geom_point(alpha = 0.5) +
-  geom_smooth(aes(color = color), method = "lm", se = FALSE) +
+scatter_log_color <- ggplot(ss_my_diamonds, aes(price, carat, col = color)) +
+  geom_point() +
+  geom_smooth(se = FALSE) +
+  scale_x_log10() +
   scale_y_log10()
 
 grid.arrange(scatter_log_cut, scatter_log_color, ncol = 2)
@@ -287,31 +278,35 @@ The regression lines in the 2nd plot of the previous exercise are difficult to d
   c. Display the 2nd plot of the previous exercise (the one with separate regression lines for color) as an array of conditional plots with facet_grid(). Do not use different colors for the categories of color.
 
 ```{r}
-ggplot(ss_my_diamonds, aes(x = carat, y = price)) +
-  geom_point(alpha = 0.5) +
-  geom_smooth(method = "lm", se = FALSE) +
+ggplot(ss_my_diamonds, aes(price, carat)) +
+  geom_point() +
+  geom_smooth(se = FALSE) +
+  scale_x_log10() +
   scale_y_log10() +
-  facet_grid(. ~ color)
+  facet_grid(cols = vars(color)) +
+  theme(axis.text.x = element_text(angle = 90, vjust = 0.5, hjust = 1))
 ```
 
   d. Do the same as in the previous exercise, but now use facet_wrap().
 
 ```{r}
-ggplot(ss_my_diamonds, aes(x = carat, y = price)) +
-  geom_point(alpha = 0.5) +
-  geom_smooth(method = "lm", se = FALSE) +
+ggplot(ss_my_diamonds, aes(price, carat)) +
+  geom_point() +
+  geom_smooth(se = FALSE) +
+  scale_x_log10() +
   scale_y_log10() +
-  facet_wrap(~ color)
+  facet_wrap(vars(color))
 ```
 
   e. Reproduce the previous plot, but now display it with linear regression lines and use the minimal theme.
 
 ```{r}
-ggplot(ss_my_diamonds, aes(x = carat, y = price)) +
-  geom_point(alpha = 0.5) +
+ggplot(ss_my_diamonds, aes(price, carat)) +
+  geom_point() +
   geom_smooth(method = "lm", se = FALSE) +
+  scale_x_log10() +
   scale_y_log10() +
-  facet_wrap(~ color) +
+  facet_wrap(vars(color)) +
   theme_minimal()
 ```
 
