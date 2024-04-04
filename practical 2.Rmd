@@ -7,8 +7,7 @@ output:
     theme: journal
     highlight: espresso
     toc: true
-    toc_float:
-      toc_collapsed: true
+    number_sections: true
     toc_depth: 2
 ---
 
