@@ -6,6 +6,9 @@ output:
   prettydoc::html_pretty:
     theme: hpstr
     highlight: github
+    toc: true
+    number_sections: true
+    toc_depth: 2
 ---
 
 ```{r setup, include=FALSE}

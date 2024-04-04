@@ -5,6 +5,9 @@ output:
   prettydoc::html_pretty:
     theme: tactile
     highlight: github
+    toc: true
+    number_sections: true
+    toc_depth: 2
 ---
 
 ```{r setup, include=FALSE}
