@@ -15,7 +15,7 @@ output:
 knitr::opts_chunk$set(warning = FALSE, message = FALSE) 
 ```
 
-## 1 The ![](diamond.jpg) data
+# The ![](diamond.jpg) data
 
 In this exercise, predict the price of diamonds from a continuous and categorical variable. The data set is diamonds d of the package ggplot2, The data set is very large, so we will work with a random sample of 500 cases.
 
@@ -31,20 +31,22 @@ data("diamonds")
 set.seed(100)
 diamonds %>%
   slice_sample(n = 500) %>%
-  mutate(cut = factor(cut)) ->
+  mutate(cut     = factor(cut, ordered = FALSE),
+         color   = factor(color, ordered = FALSE),
+         clarity = factor(clarity, ordered = FALSE)) ->
   my_diamonds
 ```
 
 ---
 
-## 1.1 Numeric predictors
+## Numeric predictors
 
 We start with a simple regression predicting the price of diamonds from the numeric predictors carat.
 
   a. Display a scatter plot of price against carat, and add a linear regression line (set the size of the points to 0.5).
   
 ```{r}
-ggplot(my_diamonds, aes(x = carat, y = price)) +
+ggplot(my_diamonds, aes(carat, price)) +
   geom_point(size = 0.5) +
   geom_smooth(method = "lm", se = FALSE)
 ```
@@ -56,7 +58,7 @@ An increase in 1 carat increases the price of the diamond by $7926.
   c. Display and interpret the summary of the model.
 
 ```{r}
-lm_model <- lm(price ~ carat, data = my_diamonds)
+lm_model <- lm(price ~ carat, my_diamonds)
 summary(lm_model)
 ```
 
@@ -65,27 +67,26 @@ The intercept parameter suggests that diamonds that have a value of zero carats 
   d. Test the significance of the model against the intercept-only model.
 
 ```{r}
-lm_intercept_only <- lm(price ~ 1, data = my_diamonds)
-anova(lm_intercept_only, lm_model)
+anova(lm(price ~ 1, my_diamonds), lm_model)
 ```
 
   e. Display and interpret a the residual plots of the model, and interpret.
 
 ```{r}
+par(mfrow = c(2, 2))
 plot(lm_model)
 ```
 
 The residuals vs fit plot suggests that the linearity assumption is not violated though there seem to be several outliers. However, the residuals are not normally distributed as a group of them stray away from the diagonal in the QQ plot. The scale-location plot implies that the assumption of homoscedasticity is not violated, but the residuals are not randomly scattered around the red line. Lastly, the residuals vs leverage plot indicates heteroskedasticity as the spread of standardised residuals decrease along the axis.
 
-## 1.2 Categorical predictor
+## Categorical predictor
 
 We now predicting the price of diamonds from the categorical predictors cut. The variables cut in this data set has class ordered (the class for ordinal variables), but, for this practical, we want it to have class factor (the class for categorical variables).
 
   a. Display boxplots of price for the different levels of cut. Interpret the result.
 
 ```{r}
-my_diamonds$cut <- factor(my_diamonds$cut, ordered = FALSE)
-ggplot(my_diamonds, aes(cut)) +
+ggplot(my_diamonds, aes(price, cut)) +
   geom_boxplot()
 ```
 
@@ -100,27 +101,26 @@ In this model, diamonds with a fair cut are the reference point. The coefficient
 
   c. What is the reference category of cut?
 
-```{r}
-levels(my_diamonds$cut)
+```{asis}
+Fair
 ```
 
   d. Which category has the highest predicted price?
 
-```{r}
-prediction <- predict(lm_model_cut, newdata = data.frame(cut = levels(my_diamonds$cut)))
-prediction_df <- data.frame(cut = levels(diamonds$cut), predicted_price = prediction)
-prediction_df[which.max(prediction_df$predicted_price), ]
+```{asis}
+Fair
 ```
 
   e. Display and interpret the residual plots of the model.
 
 ```{r}
+par(mfrow = c(2, 2))
 plot(lm_model_cut)
 ```
 
 The residuals vs fit plot suggests that the linearity assumption is not violated. However, the residuals are not normally distributed as a group of them stray away from the diagonal in the QQ plot. The scale-location plot implies that the assumption of homoscedasticity is not violated, but the residuals are not randomly scattered around the red line. Lastly, the residuals vs leverage plot indicates heteroskedasticity as the spread of standardised residuals decreases along the axis.
 
-## 1.3 Multiple regression
+## Multiple regression
 
   a. Fit the main effects model with carat and cut as predictors of price, and display and interpret its summary
 
@@ -152,17 +152,17 @@ Except for the variable carat, the levels of cut and the interaction variables a
 e. Display a scatter plot with price on the x-axis, carat on the y-axis, with different colors for the points and linear regression lines for the levels of cut. Suppress the confidence bands. What does this plot tell you about the main effects and the interaction effect of carat and cut?
 
 ```{r}
-ggplot(my_diamonds, aes(x = price, y = carat, color = cut)) +
+ggplot(my_diamonds, aes(carat, price, col = cut)) +
   geom_point() +
   geom_smooth(method = "lm", se = FALSE)
 ```
 The main effect of carat on price is positive across all levels of cut. The different cut qualities are vertically separated, with Ideal cut being the highest and Fair cut being the lowest price range. This implies that better cut grades tend to correspond to higher prices for a given carat. The effect of cut quality on price appears to be more pronounced at higher carats, with the lines diverging more as the number of carats increases. This implies that the higher price paid for better cut grades amplifies for diamonds with higher carats.
 
-## 2 Animals
+# Animals
 
 In this exercise you will work with the Animals data from the package MASS. These data include two variables measuring the brain and body weight of various animals. The central question in this exercise is: “Can we predict the weight of an animal’s brain from the weight of the animal’s body? The exercise shows that with some simple data transformations and adding a predictor we can go from 0% variance explained to almost 100%!
 
-## 2.1 Linear model
+## Linear model
 
 a. Check the help file for Animals, and display the row names to get an idea of what kinds of animals are in the data.
 
@@ -175,19 +175,22 @@ row.names(Animals)
   b. Let’s start with with some data visualizations. Display the boxplots showing the distributions of brain and body.
 
 ```{r}
-ggplot(Animals, aes(brain)) +
+library(gridExtra)
+brain_box <- ggplot(Animals, aes(y = brain)) +
   geom_boxplot()
 
-ggplot(Animals, aes(body)) +
+body_box <- ggplot(Animals, aes(y = body)) +
   geom_boxplot()
+
+grid.arrange(brain_box, body_box, ncol = 2)
 ```
 
   c. Display a scatter plot with body on the x-axis and brain on the y-axis, and add a linear regression line including the confidence band. Interpret the plot.
 
 ```{r}
-ggplot(Animals, aes(x = body, y = brain)) +
+ggplot(Animals, aes(body, brain)) +
   geom_point() +
-  geom_smooth(method = "lm", se = TRUE)
+  geom_smooth(method = "lm")
 ```
 
 The negative slope of the regression line suggests that as an animal's body weight increases, their brain weight tends to decrease. The widening of the confidence band at higher body weights indicates greater variability and uncertainty in the brain-body relationship for heavier animals.
@@ -203,40 +206,40 @@ The coefficient of body is not statistically significant at the 5% level, so we 
   e. Display the diagnostic residual plots for the previous model, and interpret the results.
 
 ```{r}
+par(mfcol = c(2, 2))
 plot(lm_m0)
 ```
 
 The residuals vs fit plot suggests that the linearity assumption is violated though there seem to be two outliers. The residuals are normally distributed according to the QQ plot. The scale-location plot implies that the assumption of homoscedasticity is violated and the residuals are not randomly scattered around the red line. Lastly, the residuals vs leverage plot indicates heteroskedasticity as the spread of standardised residuals increases along the axis.
 
-## 2.2 Data transformations
+## Data transformations
 
 Since the variables brain and body are substantially skewed, a data transformation may improve the fit of the model.
 
   a. Apply transformations to normalize the distributions of the variables body and brain, and check the result with boxplots.
 
 ```{r}
-Animals$log_body <- log(Animals$body)
-Animals$log_brain <- log(Animals$brain)
-
-ggplot(data = Animals, aes(x = 1, y = log_body)) +
+body_log <- ggplot(data = Animals, aes(y = log(body))) +
   geom_boxplot()
 
-ggplot(data = Animals, aes(x = 1, y = log_brain)) +
+brain_log <- ggplot(data = Animals, aes(y = log(brain))) +
   geom_boxplot()
+
+grid.arrange(body_log, brain_log, ncol = 2)
 ```
 
   b. Display a scatter plot of the transformed versions of brain and body, and add a linear regression line.
 
 ```{r}
-ggplot(data = Animals, aes(x = log_body, y = log_brain)) +
+ggplot(data = Animals, aes(log(body), log(brain))) +
   geom_point() +
-  geom_smooth(method = "lm", se = TRUE)
+  geom_smooth(method = "lm")
 ```
 
   c. Fit the linear model m1 with the transformed body predicting the transformed brain; display its summary, and interpret the parameter estimates and the R-squared.
 
 ```{r}
-m1 <- lm(log_brain ~ log_body, data = Animals)
+m1 <- lm(log(brain) ~ log(body), Animals)
 summary(m1)
 ```
 For a 1% increase in body mass, an animal's brain mass increases by 49.60%, ceteris paribus. The R^2 value indicates that approximately 60.76% of the variation in brain mass can be explained by body mass. This value is rather high, suggesting a reasonably good fit of the model to the data.
@@ -244,26 +247,32 @@ For a 1% increase in body mass, an animal's brain mass increases by 49.60%, cete
   d. Display the diagnostic plots for m1 and interpret. Are the model assumptions fulfilled?
 
 ```{r}
+par(mfcol = c(2, 2))
 plot(m1)
 ```
 
 The residuals vs fit plot suggests that there is non-linearity and that there seem to be several outliers. The residuals are normally distributed according to the QQ plot. The scale-location plot implies that the assumption of homoscedasticity is violate though the residuals are not randomly scattered around the red line. Lastly, the residuals vs leverage plot indicates heteroskedasticity as the spread of standardised residuals decreases along the axis.
 
-## 2.3 Adding a predictor
+## Adding a predictor
 
 Additional predictors can help to satisfy the assumptions. For the data at hand, the residuals plots show three outliers that have one thing at common; they are prehistoric species. Let’s see what happens if we add a predictor to the model that distinguishes between extinct and other species.
 
   a. Make the factor species with levels “extinct” for the prehistoric animals and “other” for the others, and add this factor to the data frame Animals.
 
 ```{r}
-Animals$species <- ifelse(Animals$body %in% c(11700.000, 9400.000, 87000.000), "extinct", "others")
-Animals$species <- factor(Animals$species, levels = c("extinct", "others"))
+Animals <- mutate(Animals, 
+                  species = recode_factor(rownames(Animals),
+                                          Brachiosaurus = "extinct",
+                                          Triceratops   = "extinct",
+                                          Dipliodocus   = "extinct", 
+                                          .default      = "other")
+                  )
 ```
 
   b. Fit the model m2 by adding the predictor species to model m1, display its summary, and interpret the parameter estimates and the R-squared.
 
 ```{r}
-m2 <- update(m1, . ~ . + species, data = Animals)
+m2 <- update(m1, . ~ . + species, Animals)
 summary(m2)
 ```
 For a 1% increase in body mass, an animal's brain mass increases by 74.86%, ceteris paribus. Animals categorised as 'others' under the species variable have 5.22% higher brain mass than animals categorised as 'extinct', ceteris paribus. The adjusted R^2 indicates that approximately 91.31% of the variation in brain mass can be explained by body mass and species type. This value is very high, suggesting a good fit of the model to the data.
@@ -271,6 +280,7 @@ For a 1% increase in body mass, an animal's brain mass increases by 74.86%, cete
   c. Display and interpret the diagnostic plots for m2.
 
 ```{r}
+par(mfcol = c(2, 2))
 plot(m2)
 ```
 
@@ -281,16 +291,23 @@ The diagnostic plots show outliers that have a higher (logarithm of) brain than 
   d. Add the level “primate” to the variable species (check which of the animals are primates).
 
 ```{r}
-Animals$species <- ifelse(Animals$body %in% c(11700, 9400, 87000), "extinct",
-                   ifelse(Animals$body %in% c(207.000, 62.000, 52.160, 6.800), "primate", "others"))
-
-Animals$species <- factor(Animals$species, levels = c("extinct", "primate", "others"))
+Animals  <- mutate(Animals, species = recode_factor(rownames(Animals),
+                                  'Brachiosaurus' = "extinct",
+                                  'Triceratops'   = "extinct",
+                                  'Dipliodocus'   = "extinct", 
+                                  'Human'         = "primate",
+                                  'Chimpanzee'    = "primate",
+                                  'Gorilla'       = "primate",
+                                  'Rhesus monkey' = "primate",
+                                  'Potar monkey'  = "primate",
+                                  .default        = "other")
+                   )
 ```
 
   e. Fit the model m3 with the modified predictor species; display its summary, and interpret the parameter estimates and the R-squared.
 
 ```{r}
-m3 <- update(m1, . ~ . + species, data = Animals)
+m3 <- update(m1, . ~ . + species, Animals)
 summary(m3)
 ```
 For a 1% increase in body mass, an animal's brain mass increases by 73.20%, ceteris paribus. Animals categorised as 'primate' under the species variable have 6.20% higher brain mass than animals categorised as 'extinct', ceteris paribus. Animals categorised as 'others' under the species variable have 4.90% higher brain mass than animals categorised as 'extinct', ceteris paribus. The adjusted R^2 indicates that approximately 95.06% of the variation in brain mass can be explained by body mass and species type. This value is very high, suggesting a good fit of the model to the data.
@@ -298,6 +315,7 @@ For a 1% increase in body mass, an animal's brain mass increases by 73.20%, cete
   f. Display and interpret the diagnostic plots for m3. What do the residual plots say about the brain weight of the Gorilla?
 
 ```{r}
+par(mfcol = c(2, 2))
 plot(m3)
 ```
 
