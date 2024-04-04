@@ -20,7 +20,7 @@ knitr::include_graphics("planets.jpg")
 
 **Warning**: Before you can knit this file, download the image “planets.jpg” and place it in the same folder as your Rmd file.
 
-## **1 Instructions**
+# **Instructions**
 Copy-paste the text of this practical in an Rmd file called “Practical 2” and render an html document with:
 
 + the text formatted identically to that in the original
@@ -37,8 +37,8 @@ Test the R code in each chunk within your Rmd file, and regularly knit the html 
 
 Consult the Base R Cheat Sheet and the R Markdown Cheat Sheet for help.
 
-## **2 Data objects**
-### **2.1 Vectors**
+# **Data objects**
+## **Vectors**
 Below you see code that makes 5 vectors containing information about planets. Run this code in your Rmd file, and check the classes of these vectors in your workspace.
 
 ```{r}
@@ -86,7 +86,7 @@ Display the names of the planets with a diameter greater than 1.
 name[diameter > 1]
 ```
 
-### **2.2 Matrices**
+## **Matrices**
 Collect the above five vectors in a matrix called planets, and display the result.
 
 ```{r}
@@ -146,7 +146,7 @@ Display planets leaving out the 1st row and 1st column.
 planets[-1, -1]
 ```
 
-### **2.3 Data frames**
+## **Data frames**
 Make a data frame called planets_df containing all five vectors as variables.
 
 Display the classes of the variables in planets_df with the function sapply().
@@ -174,7 +174,7 @@ Display the 5th element of the variable name using a dollar sign and square brac
 planets_df$name[5]
 ```
 
-### **2.4 Lists**
+## **Lists**
 Make a list called planet_list with its 1st element called “matrix” containing the matrix planets, and its 2nd element called “data frame” (make sure to add the space between “data” and “frame”) containing the data frame “planet_df”.
 
 ```{r}
