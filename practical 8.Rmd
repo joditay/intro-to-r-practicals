@@ -26,19 +26,15 @@ cumsum(1:4)
   
 ```{r}
 my_cumsum <- function(x) {
-  if (!is.vector(x)) {
-    stop()
+  
+  output <- numeric(length(x))
+  
+  for (i in 1:length(x)) {
+    
+     output[i] <- sum(x[1:i])
   }
   
-  n <- length(x)
-  cumsum_values <- numeric(n)
-  cumsum_values[1] <- x[1]
-  
-  for (i in 2:n) {
-    cumsum_values[i] <- cumsum_values[i - 1] + x[i]
-  }
-  
-  return(cumsum_values)
+  return(output)
 }
 ```
   
@@ -66,7 +62,7 @@ fit <- lm(mpg ~ disp + drat + qsec, data = mtcars)
   c. Display the summary of this model.
 
 ```{r}
-summary(fit)
+(sum.fit <- summary(fit))
 ```
 
   d. Save the bootstrap object for the same model.
@@ -95,7 +91,7 @@ However, the bootstrap confidence interval is significantly wider than the theor
 library(ggplot2)
 library(gridExtra)
 mpg_plot <- ggplot(boot_fit) + 
-  geom_histogram(aes(x = Intercept), fill = "red") +
+  geom_density(aes(x = Intercept), col = "red") +
   stat_function(fun = dnorm,
                 args = list(
                   mean = 11.524390,
@@ -103,27 +99,27 @@ mpg_plot <- ggplot(boot_fit) +
                 col = "blue")
 
 disp_plot <- ggplot(boot_fit) + 
-  geom_histogram(aes(x = disp), fill = "red") +
+  geom_density(aes(x = disp), col = "red") +
   stat_function(fun = dnorm,
                 args = list(
-                  mean = -0.03136425,
-                  sd = 0.007808782),
+                  mean = fit$coef[2],
+                  sd = sum.fit$coef[2, 2]),
                 col = "blue")
 
 drat_plot <- ggplot(boot_fit) + 
-  geom_histogram(aes(x = drat), fill = "red") +
+  geom_density(aes(x = drat), col = "red") +
   stat_function(fun = dnorm,
                 args = list(
-                  mean = -0.03136425,
-                  sd = 0.007808782),
+                  mean = fit$coef[3],
+                  sd = sum.fit$coef[3, 2]),
                 col = "blue")
 
 qsec_plot <- ggplot(boot_fit) + 
-  geom_histogram(aes(x = qsec), fill = "red") +
+  geom_density(aes(x = qsec), col = "red") +
   stat_function(fun = dnorm,
                 args = list(
-                  mean = -0.03136425,
-                  sd = 0.007808782),
+                  mean = fit$coef[4],
+                  sd = sum.fit$coef[4, 2]),
                 col = "blue")
 
 grid.arrange(mpg_plot, disp_plot, drat_plot, qsec_plot, ncol = 2)
