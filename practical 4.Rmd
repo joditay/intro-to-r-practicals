@@ -134,7 +134,7 @@ In the following exercises, save the results by using the assignment operator.
 On the help page of the codling data the variable gp is listed as a factor, but in the data it is a numeric variable. Convert it into a factor.
 ```{r}
 codling %>%
-  mutate(gp = as.numeric(gp)) ->
+  mutate(gp = factor(gp), Cultivar = factor(Cultivar)) ->
   codling
 ```
 
@@ -148,17 +148,25 @@ codling %>%
 
 Display a summary of the codling2 variable Cultivar (do not save result).
 ```{r}
-
+codling2 %>% 
+  select(Cultivar) %>% 
+  summary()
 ```
 
 The factor Cultivar has empty levels. Find a function to get rid of these empty levels, and overwrite the codling2 data such that Cultivar only has non-empty levels. Display the summary of Cultivar to check if the empty levels are removed.
 ```{r}
-
+codling2 %>% 
+  mutate(Cultivar = droplevels(Cultivar)) %>%
+  select(Cultivar) %>% 
+  summary()
 ```
 
 Add the new variable survived denoting the number of moths that survived (computed as tot - dead) to codling2, and display the means and standard deviations of this new variable within the levels of Cultivar.
 ```{r}
-
+codling2 %>% 
+  mutate(survived = tot - dead) %>%
+  group_by(Cultivar) %>% 
+  summarise(mean(survived), sd(survived))
 ```
 
 ---
