@@ -41,10 +41,10 @@ Consult the Base R Cheat Sheet and the R Markdown Cheat Sheet for help.
 Below you see code that makes 5 vectors containing information about planets. Run this code in your Rmd file, and check the classes of these vectors in your workspace.
 
 ```{r}
-name     <- c("Mercury", "Venus", "Earth", "Mars", 
+name <- c("Mercury", "Venus", "Earth", "Mars", 
               "Jupiter", "Saturn", "Uranus", "Neptune")
 
-type     <- factor(c("Terrestrial planet", "Terrestrial planet", 
+type <- factor(c("Terrestrial planet", "Terrestrial planet", 
                      "Terrestrial planet", "Terrestrial planet", "Gas giant", 
                      "Gas giant", "Gas giant", "Gas giant"))
 
@@ -52,7 +52,7 @@ diameter <- c(0.382, 0.949, 1, 0.532, 11.209, 9.449, 4.007, 3.883)
 
 rotation <- c(58.64, -243.02, 1, 1.03, 0.41, 0.43, -0.72, 0.67)
 
-rings    <- c(FALSE, FALSE, FALSE, FALSE, TRUE, TRUE, TRUE, TRUE)
+rings <- c(FALSE, FALSE, FALSE, FALSE, TRUE, TRUE, TRUE, TRUE)
 ```
 
 Display the 2nd element of rotation.
@@ -89,8 +89,7 @@ name[diameter > 1]
 Collect the above five vectors in a matrix called planets, and display the result.
 
 ```{r}
-planets <- cbind(name, type, diameter, rotation, rings)
-planets
+(planets <- cbind(name, type, diameter, rotation, rings))
 ```
 
 Display the classes of the columns of planets with the function apply().
@@ -103,8 +102,7 @@ Remake the matrix planets (overwrite the previous version) using only the vector
 
 ```{r}
 planets <- cbind(type, diameter, rotation, rings)
-rownames(planets) <- name
-planets
+(rownames(planets) <- name)
 ```
 
 Again, display the classes of the columns of the matrix planets. What is the difference with the previous version?
