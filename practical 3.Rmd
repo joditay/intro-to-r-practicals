@@ -15,7 +15,7 @@ output:
 knitr::opts_chunk$set(echo = TRUE)
 ```
 
-## Summary statistics
+# Summary statistics
 
 Make a data frame df with 100 observations, row names id.1 to id.100, and 4 variables (without making the the separate vectors first):
 
@@ -65,7 +65,7 @@ Display the covariance matrix of X and Y (use only the x argument in the cov() f
 cov(df[, 1:2])
 ```
 
-## Logical tests
+# Logical tests
 
 Display a logical vector with value TRUE if X is greater than 110 and FALSE otherwise.
 
@@ -161,7 +161,7 @@ Do the same pairwise comparison with a function starting with the letters pair.
 pairwise.t.test(df$X, df$R)
 ```
 
-## Using help
+# Using help
 
 For the following exercises you need to find the appropriate function (these functions have not been discussed in the lecture sheets). For each of the exercises, use a single line of code and as few functions/operators as possible!
 
@@ -198,8 +198,7 @@ cor.test(df$X, df$Y)
 Convert the factor R from a nominal variable to an ordinal variable (overwrite the version in df), and display the content of the variable.
 
 ```{r}
-df$R <- as.ordered(df$R) 
-df$R
+(df$R <- as.ordered(df$R)) 
 ```
 
 Display the first 6 observations of R.
