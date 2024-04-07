@@ -163,8 +163,11 @@ codling2 %>%
 
 Add the new variable survived denoting the number of moths that survived (computed as tot - dead) to codling2, and display the means and standard deviations of this new variable within the levels of Cultivar.
 ```{r}
+codling2 %>%
+  mutate(survived = tot - dead) ->
+  codling2
+
 codling2 %>% 
-  mutate(survived = tot - dead) %>%
   group_by(Cultivar) %>% 
   summarise(mean(survived), sd(survived))
 ```
